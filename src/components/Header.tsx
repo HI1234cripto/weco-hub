@@ -1,11 +1,14 @@
 import { Link, useLocation } from "react-router-dom";
-import { Leaf, Menu, X } from "lucide-react";
+import { Leaf, Menu, X, LogOut, Shield } from "lucide-react";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
+import { useAuth } from "@/lib/auth";
+import { Button } from "@/components/ui/button";
 
 const Header = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const location = useLocation();
+  const { user, isAdmin, signOut } = useAuth();
 
   const navItems = [
     { name: "Home", path: "/" },
@@ -57,6 +60,33 @@ const Header = () => {
             >
               Wychwood School
             </a>
+            
+            {user ? (
+              <>
+                {isAdmin && (
+                  <Link
+                    to="/admin"
+                    className="flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-primary transition-colors"
+                  >
+                    <Shield size={16} />
+                    Admin
+                  </Link>
+                )}
+                <Button
+                  onClick={() => signOut()}
+                  variant="outline"
+                  size="sm"
+                  className="flex items-center gap-2"
+                >
+                  <LogOut size={16} />
+                  Logout
+                </Button>
+              </>
+            ) : (
+              <Button asChild size="sm" className="bg-primary hover:bg-primary/90 text-primary-foreground">
+                <Link to="/auth">Login</Link>
+              </Button>
+            )}
           </nav>
 
           {/* Mobile Menu Button */}
@@ -94,6 +124,43 @@ const Header = () => {
             >
               Wychwood School
             </a>
+            
+            {user ? (
+              <>
+                {isAdmin && (
+                  <Link
+                    to="/admin"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="flex items-center gap-2 text-base font-medium text-muted-foreground hover:text-primary transition-colors py-2"
+                  >
+                    <Shield size={16} />
+                    Admin Panel
+                  </Link>
+                )}
+                <Button
+                  onClick={() => {
+                    signOut();
+                    setMobileMenuOpen(false);
+                  }}
+                  variant="outline"
+                  size="sm"
+                  className="flex items-center gap-2 w-full justify-start"
+                >
+                  <LogOut size={16} />
+                  Logout
+                </Button>
+              </>
+            ) : (
+              <Button
+                asChild
+                size="sm"
+                className="bg-primary hover:bg-primary/90 text-primary-foreground w-full"
+              >
+                <Link to="/auth" onClick={() => setMobileMenuOpen(false)}>
+                  Login
+                </Link>
+              </Button>
+            )}
           </nav>
         )}
       </div>
