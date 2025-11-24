@@ -1,58 +1,38 @@
+import { useEffect, useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Calendar, Clock } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+
+interface NewsPost {
+  id: string;
+  title: string;
+  excerpt: string;
+  category: string;
+  image_url: string;
+  read_time: string;
+  published_date: string;
+}
 
 const News = () => {
-  const newsItems = [
-    {
-      title: "Spring Garden Project Launch",
-      date: "March 15, 2024",
-      category: "Project",
-      image: "https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=800&h=400&fit=crop",
-      excerpt: "WECO is excited to announce the launch of our new community garden project. Students will learn about sustainable growing practices while creating a green space for the school.",
-      readTime: "3 min read",
-    },
-    {
-      title: "Recycling Drive Success",
-      date: "March 8, 2024",
-      category: "Achievement",
-      image: "https://images.unsplash.com/photo-1532996122724-e3c354a0b15b?w=800&h=400&fit=crop",
-      excerpt: "Our February recycling drive collected over 500kg of recyclable materials! Thank you to everyone who participated in making this our most successful drive yet.",
-      readTime: "2 min read",
-    },
-    {
-      title: "World Water Day Workshop",
-      date: "March 1, 2024",
-      category: "Event",
-      image: "https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=800&h=400&fit=crop",
-      excerpt: "Join us for an interactive workshop on water conservation. Learn practical tips for reducing water waste at home and school. Open to all students.",
-      readTime: "2 min read",
-    },
-    {
-      title: "New Solar Panel Installation",
-      date: "February 20, 2024",
-      category: "Project",
-      image: "https://images.unsplash.com/photo-1509391366360-2e959784a276?w=800&h=400&fit=crop",
-      excerpt: "Thanks to collaborative efforts with the school administration, we're installing solar panels on the main building. This will reduce our carbon footprint significantly.",
-      readTime: "4 min read",
-    },
-    {
-      title: "Beach Clean-Up Day",
-      date: "February 10, 2024",
-      category: "Event",
-      image: "https://images.unsplash.com/photo-1618477461853-cf6ed80faba5?w=800&h=400&fit=crop",
-      excerpt: "WECO members joined forces with local environmental groups for a coastal clean-up. Together, we collected over 100kg of waste from the shoreline.",
-      readTime: "3 min read",
-    },
-    {
-      title: "Zero Waste Challenge Begins",
-      date: "February 1, 2024",
-      category: "Initiative",
-      image: "https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?w=800&h=400&fit=crop",
-      excerpt: "This month, we're challenging all students to reduce their waste. Track your progress and compete with classmates to see who can go the longest without sending waste to landfill.",
-      readTime: "2 min read",
-    },
-  ];
+  const [newsItems, setNewsItems] = useState<NewsPost[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchNews();
+  }, []);
+
+  const fetchNews = async () => {
+    const { data, error } = await supabase
+      .from("news_posts")
+      .select("id, title, excerpt, category, image_url, read_time, published_date")
+      .order("published_date", { ascending: false });
+
+    if (!error && data) {
+      setNewsItems(data);
+    }
+    setLoading(false);
+  };
 
   const getCategoryColor = (category: string) => {
     switch (category) {
@@ -69,6 +49,14 @@ const News = () => {
     }
   };
 
+  if (loading) {
+    return (
+      <div className="min-h-screen pt-24 pb-16 flex items-center justify-center">
+        <p className="text-muted-foreground">Loading news...</p>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen pt-24 pb-16">
       <div className="container mx-auto px-4">
@@ -81,41 +69,47 @@ const News = () => {
         </div>
 
         {/* News Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {newsItems.map((item, index) => (
-            <Card
-              key={index}
-              className="overflow-hidden hover:shadow-card transition-all duration-300 hover:-translate-y-1 bg-card border-border"
-            >
-              <div className="relative h-48 overflow-hidden">
-                <img
-                  src={item.image}
-                  alt={item.title}
-                  className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
-                />
-                <Badge className={`absolute top-4 right-4 ${getCategoryColor(item.category)}`}>
-                  {item.category}
-                </Badge>
-              </div>
-              <div className="p-6">
-                <div className="flex items-center gap-4 text-sm text-muted-foreground mb-3">
-                  <div className="flex items-center gap-1">
-                    <Calendar size={14} />
-                    <span>{item.date}</span>
-                  </div>
-                  <div className="flex items-center gap-1">
-                    <Clock size={14} />
-                    <span>{item.readTime}</span>
-                  </div>
+        {newsItems.length === 0 ? (
+          <div className="text-center py-20">
+            <p className="text-xl text-muted-foreground">No news posts yet. Check back soon!</p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {newsItems.map((item, index) => (
+              <Card
+                key={index}
+                className="overflow-hidden hover:shadow-card transition-all duration-300 hover:-translate-y-1 bg-card border-border"
+              >
+                <div className="relative h-48 overflow-hidden">
+                  <img
+                    src={item.image_url}
+                    alt={item.title}
+                    className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
+                  />
+                  <Badge className={`absolute top-4 right-4 ${getCategoryColor(item.category)}`}>
+                    {item.category}
+                  </Badge>
                 </div>
-                <h3 className="text-xl font-semibold mb-3 text-foreground hover:text-primary transition-colors">
-                  {item.title}
-                </h3>
-                <p className="text-muted-foreground">{item.excerpt}</p>
-              </div>
-            </Card>
-          ))}
-        </div>
+                <div className="p-6">
+                  <div className="flex items-center gap-4 text-sm text-muted-foreground mb-3">
+                    <div className="flex items-center gap-1">
+                      <Calendar size={14} />
+                      <span>{item.published_date}</span>
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <Clock size={14} />
+                      <span>{item.read_time}</span>
+                    </div>
+                  </div>
+                  <h3 className="text-xl font-semibold mb-3 text-foreground hover:text-primary transition-colors">
+                    {item.title}
+                  </h3>
+                  <p className="text-muted-foreground">{item.excerpt}</p>
+                </div>
+              </Card>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );
