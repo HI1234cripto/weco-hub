@@ -32,7 +32,9 @@ const newsPostSchema = z.object({
   excerpt: z.string().trim().min(1, "Excerpt is required").max(500),
   content: z.string().trim().min(1, "Content is required").max(10000),
   category: z.string().min(1, "Category is required"),
-  image_url: z.string().trim().url("Must be a valid URL").max(500),
+  image_url: z.string().trim().max(500).refine((val) => val === "" || z.string().url().safeParse(val).success, {
+    message: "Must be a valid URL",
+  }).optional().or(z.literal("")),
   read_time: z.string().trim().min(1, "Read time is required").max(20),
   published_date: z.string().min(1, "Date is required"),
 });
@@ -299,7 +301,7 @@ const Admin = () => {
                   </div>
 
                   <div>
-                    <Label htmlFor="image_url">Image URL</Label>
+                    <Label htmlFor="image_url">Image URL (optional)</Label>
                     <Input
                       id="image_url"
                       type="url"
@@ -307,7 +309,6 @@ const Admin = () => {
                       onChange={(e) =>
                         setFormData({ ...formData, image_url: e.target.value })
                       }
-                      required
                       maxLength={500}
                       placeholder="https://images.unsplash.com/..."
                     />
