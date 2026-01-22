@@ -3,13 +3,20 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Calendar, Clock } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 interface NewsPost {
   id: string;
   title: string;
   excerpt: string;
+  content: string;
   category: string;
-  image_url: string;
+  image_url: string | null;
   read_time: string;
   published_date: string;
 }
@@ -17,6 +24,7 @@ interface NewsPost {
 const News = () => {
   const [newsItems, setNewsItems] = useState<NewsPost[]>([]);
   const [loading, setLoading] = useState(true);
+  const [selectedPost, setSelectedPost] = useState<NewsPost | null>(null);
 
   useEffect(() => {
     fetchNews();
@@ -25,7 +33,7 @@ const News = () => {
   const fetchNews = async () => {
     const { data, error } = await supabase
       .from("news_posts")
-      .select("id, title, excerpt, category, image_url, read_time, published_date")
+      .select("id, title, excerpt, content, category, image_url, read_time, published_date")
       .order("published_date", { ascending: false });
 
     if (!error && data) {
@@ -75,17 +83,24 @@ const News = () => {
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {newsItems.map((item, index) => (
+            {newsItems.map((item) => (
               <Card
-                key={index}
-                className="overflow-hidden hover:shadow-card transition-all duration-300 hover:-translate-y-1 bg-card border-border"
+                key={item.id}
+                className="overflow-hidden hover:shadow-card transition-all duration-300 hover:-translate-y-1 bg-card border-border cursor-pointer"
+                onClick={() => setSelectedPost(item)}
               >
                 <div className="relative h-48 overflow-hidden">
-                  <img
-                    src={item.image_url}
-                    alt={item.title}
-                    className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
-                  />
+                  {item.image_url ? (
+                    <img
+                      src={item.image_url}
+                      alt={item.title}
+                      className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
+                    />
+                  ) : (
+                    <div className="w-full h-full bg-muted flex items-center justify-center">
+                      <span className="text-muted-foreground">No image</span>
+                    </div>
+                  )}
                   <Badge className={`absolute top-4 right-4 ${getCategoryColor(item.category)}`}>
                     {item.category}
                   </Badge>
@@ -110,6 +125,40 @@ const News = () => {
             ))}
           </div>
         )}
+
+        {/* Post Detail Dialog */}
+        <Dialog open={!!selectedPost} onOpenChange={(open) => !open && setSelectedPost(null)}>
+          <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+            {selectedPost && (
+              <>
+                <DialogHeader>
+                  <div className="flex items-center gap-2 mb-2">
+                    <Badge className={getCategoryColor(selectedPost.category)}>
+                      {selectedPost.category}
+                    </Badge>
+                    <span className="text-sm text-muted-foreground">
+                      {selectedPost.published_date} • {selectedPost.read_time}
+                    </span>
+                  </div>
+                  <DialogTitle className="text-2xl">{selectedPost.title}</DialogTitle>
+                </DialogHeader>
+                {selectedPost.image_url && (
+                  <div className="relative h-64 overflow-hidden rounded-lg my-4">
+                    <img
+                      src={selectedPost.image_url}
+                      alt={selectedPost.title}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                )}
+                <div className="prose prose-sm max-w-none text-foreground">
+                  <p className="text-muted-foreground font-medium mb-4">{selectedPost.excerpt}</p>
+                  <div className="whitespace-pre-wrap">{selectedPost.content}</div>
+                </div>
+              </>
+            )}
+          </DialogContent>
+        </Dialog>
       </div>
     </div>
   );
