@@ -18,6 +18,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Pencil, Trash2, Plus, AlertTriangle, CheckCircle, Info, RefreshCw } from "lucide-react";
 import { z } from "zod";
+import { ImageUpload } from "@/components/ImageUpload";
 
 interface ActivityLog {
   id: string;
@@ -301,16 +302,12 @@ const Admin = () => {
                   </div>
 
                   <div>
-                    <Label htmlFor="image_url">Image URL (optional)</Label>
-                    <Input
-                      id="image_url"
-                      type="url"
+                    <Label>Image (optional)</Label>
+                    <ImageUpload
                       value={formData.image_url}
-                      onChange={(e) =>
-                        setFormData({ ...formData, image_url: e.target.value })
+                      onChange={(url) =>
+                        setFormData({ ...formData, image_url: url })
                       }
-                      maxLength={500}
-                      placeholder="https://images.unsplash.com/..."
                     />
                   </div>
 
