@@ -62,11 +62,11 @@ const Footer = () => {
                 Contact: R. Humphres
               </p>
               <a
-                href="mailto:weco@wychwoodschool.org"
+                href="mailto:R.Humphreys@wychwoodschool.org"
                 className="flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors"
               >
                 <Mail size={16} />
-                weco@wychwoodschool.org
+                R.Humphreys@wychwoodschool.org
               </a>
               <div className="flex gap-4 mt-4">
                 <a
