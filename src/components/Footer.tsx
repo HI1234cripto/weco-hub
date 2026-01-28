@@ -1,7 +1,11 @@
 import { Leaf, Mail, Instagram, Twitter } from "lucide-react";
 import { Link } from "react-router-dom";
+import { useSiteContent, FooterContent } from "@/hooks/useSiteContent";
 
 const Footer = () => {
+  const { data: footerContent } = useSiteContent("footer");
+  const footer = (footerContent as { content: FooterContent } | undefined)?.content;
+
   return (
     <footer className="bg-card border-t border-border mt-20">
       <div className="container mx-auto px-4 py-12">
@@ -18,7 +22,7 @@ const Footer = () => {
               </div>
             </div>
             <p className="text-sm text-muted-foreground">
-              Empowering students to create a sustainable future through environmental action and education.
+              {footer?.description || "Empowering students to create a sustainable future through environmental action and education."}
             </p>
           </div>
 
@@ -59,14 +63,14 @@ const Footer = () => {
             <h4 className="font-semibold text-foreground mb-4">Connect With Us</h4>
             <div className="space-y-3">
               <p className="text-sm text-muted-foreground">
-                Contact: R. Humphres
+                Contact: {footer?.contact_name || "R. Humphres"}
               </p>
               <a
-                href="mailto:R.Humphreys@wychwoodschool.org"
+                href={`mailto:${footer?.contact_email || "R.Humphreys@wychwoodschool.org"}`}
                 className="flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors"
               >
                 <Mail size={16} />
-                R.Humphreys@wychwoodschool.org
+                {footer?.contact_email || "R.Humphreys@wychwoodschool.org"}
               </a>
               <div className="flex gap-4 mt-4">
                 <a
@@ -88,7 +92,7 @@ const Footer = () => {
 
         <div className="border-t border-border mt-8 pt-8 text-center">
           <p className="text-sm text-muted-foreground">
-            © {new Date().getFullYear()} Wychwood Eco Club. Part of Wychwood School.
+            © {new Date().getFullYear()} {footer?.copyright || "Wychwood Eco Club. Part of Wychwood School."}
           </p>
         </div>
       </div>

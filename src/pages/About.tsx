@@ -1,8 +1,12 @@
 import { Card } from "@/components/ui/card";
 import { Users, Target, Heart, Award } from "lucide-react";
 import aboutImage from "@/assets/about-eco.jpg";
+import { useSiteContent, AboutPageContent } from "@/hooks/useSiteContent";
 
 const About = () => {
+  const { data: aboutContent } = useSiteContent("about_page");
+  const about = (aboutContent as { content: AboutPageContent } | undefined)?.content;
+
   const values = [
     {
       icon: Target,
@@ -63,9 +67,9 @@ const About = () => {
         </div>
         
         <div className="relative z-10 container mx-auto px-4 text-center text-white">
-          <h1 className="text-5xl md:text-6xl font-bold mb-6">About WECO</h1>
+          <h1 className="text-5xl md:text-6xl font-bold mb-6">{about?.title || "About WECO"}</h1>
           <p className="text-xl md:text-2xl max-w-3xl mx-auto text-gray-100">
-            A student-led initiative at Wychwood School dedicated to environmental sustainability and positive change
+            {about?.description || "A student-led initiative at Wychwood School dedicated to environmental sustainability and positive change"}
           </p>
         </div>
       </section>
@@ -73,12 +77,12 @@ const About = () => {
       <div className="container mx-auto px-4">
         {/* Our Story */}
         <section className="mb-20">
-          <h2 className="text-4xl font-bold mb-8 text-center text-foreground">Our Story</h2>
+          <h2 className="text-4xl font-bold mb-8 text-center text-foreground">{about?.mission_title || "Our Story"}</h2>
           <div className="max-w-4xl mx-auto space-y-6 text-lg text-muted-foreground leading-relaxed">
             <p>
-              Founded by passionate students who wanted to make a real difference, WECO (Wychwood Eco Club) 
+              {about?.mission_description || `Founded by passionate students who wanted to make a real difference, WECO (Wychwood Eco Club) 
               has grown into a vibrant community of environmental advocates. What started as a small group 
-              of friends discussing climate change has evolved into a school-wide movement.
+              of friends discussing climate change has evolved into a school-wide movement.`}
             </p>
             <p>
               Today, we're proud to lead numerous sustainability initiatives across Wychwood School, from 
@@ -111,6 +115,18 @@ const About = () => {
                 </Card>
               ))}
             </div>
+            {about?.values && about.values.length > 0 && (
+              <div className="flex flex-wrap justify-center gap-3 mt-8">
+                {about.values.map((value, index) => (
+                  <span
+                    key={index}
+                    className="bg-primary/10 text-primary px-4 py-2 rounded-full text-sm font-medium"
+                  >
+                    {value}
+                  </span>
+                ))}
+              </div>
+            )}
           </div>
         </section>
 
