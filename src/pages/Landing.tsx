@@ -3,8 +3,12 @@ import { Card } from "@/components/ui/card";
 import { Leaf, Droplet, Recycle, Users, ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
 import heroImage from "@/assets/hero-eco.jpg";
+import { useSiteContent, LandingHeroContent } from "@/hooks/useSiteContent";
 
 const Landing = () => {
+  const { data: heroContent } = useSiteContent("landing_hero");
+  const hero = (heroContent as { content: LandingHeroContent } | undefined)?.content;
+
   const initiatives = [
     {
       icon: Recycle,
@@ -43,22 +47,22 @@ const Landing = () => {
         
         <div className="relative z-10 container mx-auto px-4 text-center text-white">
           <h1 className="text-5xl md:text-7xl font-bold mb-6 animate-fade-in">
-            Together for a
+            {hero?.title || "Together for a"}
             <span className="block mt-2 bg-gradient-to-r from-teal-300 to-green-300 bg-clip-text text-transparent">
               Greener Tomorrow
             </span>
           </h1>
           <p className="text-xl md:text-2xl mb-8 max-w-2xl mx-auto text-gray-100 animate-slide-up">
-            Wychwood Eco Club - Empowering students to create positive environmental change
+            {hero?.description || "Wychwood Eco Club - Empowering students to create positive environmental change"}
           </p>
           <div className="flex gap-4 justify-center flex-wrap">
             <Button asChild size="lg" className="bg-primary hover:bg-primary/90 text-primary-foreground font-semibold">
               <Link to="/about">
-                Learn More <ArrowRight className="ml-2 h-5 w-5" />
+                {hero?.cta_primary || "Learn More"} <ArrowRight className="ml-2 h-5 w-5" />
               </Link>
             </Button>
             <Button asChild size="lg" variant="outline" className="bg-white/10 backdrop-blur-sm border-white/30 text-white hover:bg-white/20">
-              <Link to="/news">Latest News</Link>
+              <Link to="/news">{hero?.cta_secondary || "Latest News"}</Link>
             </Button>
           </div>
         </div>

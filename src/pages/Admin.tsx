@@ -16,9 +16,10 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { Pencil, Trash2, Plus, AlertTriangle, CheckCircle, Info, RefreshCw } from "lucide-react";
+import { Pencil, Trash2, Plus, AlertTriangle, CheckCircle, Info, RefreshCw, FileText } from "lucide-react";
 import { z } from "zod";
 import { ImageUpload } from "@/components/ImageUpload";
+import ContentEditor from "@/components/ContentEditor";
 
 interface ActivityLog {
   id: string;
@@ -222,6 +223,10 @@ const Admin = () => {
         <Tabs defaultValue="posts" className="w-full">
           <TabsList className="mb-6">
             <TabsTrigger value="posts">News Posts</TabsTrigger>
+            <TabsTrigger value="content">
+              <FileText className="h-4 w-4 mr-2" />
+              Site Content
+            </TabsTrigger>
             <TabsTrigger value="activity">
               Activity Log
               {activityLogs.filter(l => l.type === "error").length > 0 && (
@@ -408,6 +413,10 @@ const Admin = () => {
                 )}
               </div>
             </div>
+          </TabsContent>
+
+          <TabsContent value="content">
+            <ContentEditor />
           </TabsContent>
 
           <TabsContent value="activity">
